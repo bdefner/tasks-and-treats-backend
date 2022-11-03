@@ -16,9 +16,26 @@ export type UserWithoutPasswordHash = {
 export async function getUserByUsername(username: string) {
   if (!username) return undefined;
 
+  const [user] = await sql<UserWithoutPasswordHash[]>`
+  SELECT
+    user_id,
+    username,
+    email
+  FROM
+    users
+  WHERE
+    users.username = ${username}
+  `;
+
+  return user;
+}
+
+// For Login only
+
+export async function getUserWithPasswordHashByUsername(username: string) {
   const [user] = await sql<User[]>`
   SELECT
-    *
+   *
   FROM
     users
   WHERE
@@ -44,5 +61,6 @@ export async function createUser(
     email
   `;
 
+  // return the user without the password_hash!
   return userWithoutPasswordHash;
 }

@@ -1,37 +1,48 @@
+import crypto from 'node:crypto';
 import bcrypt from 'bcrypt';
 import { NextApiRequest, NextApiResponse } from 'next';
-import {
-  createUser,
-  getUserByEmail,
-  getUserByUsername,
-} from '../../database/users';
+import { createSession } from '../../database/sessions';
+import { createUser, getUserByUsername } from '../../database/users';
+import { createCsrfSecret } from '../../utils/csrf';
 
-type RegisterResponseBody =
+type SignupResponseBody =
   | { errors: { message: string }[] }
   | { user: { username: string } };
 
 export default async function handler(
   request: NextApiRequest,
-  response: NextApiResponse<RegisterResponseBody>,
+  response: NextApiResponse<SignupResponseBody>,
 ) {
-  console.log(request.body.username);
   // Check for request method
   if (request.method !== 'POST') {
-    response
-      .status(401)
-      .json({ message: 'This route only allows the method POST' });
+    response.status(401).json({
+      errors: [{ message: 'This api endpoint only allows the method POST' }],
+    });
   } else {
+    // Check if the body is parsed
+
+    let parsedRequestBody = request.body;
+
+    try {
+      parsedRequestBody = JSON.parse(request.body);
+    } catch (error) {
+      console.log(error);
+    }
     // Check if the input is correct
 
     if (
       // typeof request.body.username !== 'string' ||
       // typeof request.body.password !== 'string' ||
-      !request.body.username ||
-      !request.body.email ||
-      !request.body.password
+      !parsedRequestBody.username ||
+      !parsedRequestBody.email ||
+      !parsedRequestBody.password
     ) {
       response.status(400).json({
-        message: 'Bad request: username, email or password not provided!',
+        errors: [
+          {
+            message: 'Bad request: username, email or password not provided!',
+          },
+        ],
       });
     }
 
@@ -39,7 +50,9 @@ export default async function handler(
 
     const userByUsername = await getUserByUsername(request.body.username);
     if (userByUsername) {
-      response.status(401).json({ message: `Username is already taken!` });
+      response
+        .status(401)
+        .json({ errors: [{ message: `Username is already taken!` }] });
     }
 
     // ToDo Check if the email address  is already taken
@@ -59,13 +72,38 @@ export default async function handler(
     // Create the user
 
     const userWithoutPasswordHash = await createUser(
-      request.body.username,
-      request.body.email,
+      parsedRequestBody.username,
+      parsedRequestBody.email,
       passwordHash,
     );
 
-    response
-      .status(200)
-      .json({ user: { username: userWithoutPasswordHash.username } });
+    if (!userWithoutPasswordHash) {
+      response.status(401).json({
+        errors: [
+          {
+            message:
+              'User registration failed for an unhandled reason. Sorry for that! Please try again.',
+          },
+        ],
+      });
+    } else {
+      // Create a csrf secret
+
+      const secret = await createCsrfSecret();
+
+      // Create a session token
+
+      const session = await createSession(
+        userWithoutPasswordHash.userId,
+        crypto.randomBytes(80).toString('base64'),
+        secret,
+      );
+
+      // Save the session token
+
+      response
+        .status(200)
+        .json({ user: { username: userWithoutPasswordHash.username } });
+    }
   }
 }

@@ -1,34 +1,29 @@
-// import { sql } from './connect';
+import { sql } from './connect';
 
-export const carts = [
-  {
-    text: 'Do this!',
-    taskInput: 'Do this',
-    rating: 3,
-    id: Math.random().toString(),
-    cartId: 1,
-  },
-  {
-    text: 'Do that!',
-    taskInput: 'Do that',
-    rating: 8,
-    id: Math.random().toString(),
-    cartId: 2,
-  },
-];
+export type Carts = {
+  cartId: number;
+  userId: number;
+  timeOfCreation: string;
+  typeId: number;
+  label: string;
+  dueDate: string;
+  statusId: number;
+  assignedToUserId: number;
+  receivedFromUserId: number;
+  groupId: number;
+};
 
-// export type Carts = {
-//   id: number;
-//   text: string;
-//   rating: number;
-//   type: string;
-//   shared_token_id: number | null;
-// };
+export async function getAllCartsByUserId(userId: number) {
+  if (!userId) return undefined;
 
-// // Get all carts
-// export async function getAllCarts() {
-//   const carts = await sql<Carts[]>`
-//   SELECT * FROM carts
-//   `;
-//   return carts;
-// }
+  const carts = await sql<Carts[]>`
+  SELECT
+    *
+  FROM
+    carts
+  WHERE
+    user_id = ${userId}
+  `;
+
+  return carts;
+}

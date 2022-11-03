@@ -2,12 +2,17 @@ const users = [
   {
     username: 'Beppino',
     email: 'notreal@email.at',
-    password_hash: 'dsh78932z4iughf32987zrwer342',
+    password_hash:
+      '$2b$12$7uko00ffLocRlRNImwl.zu4oP3ctHK9NgZ5ustrhaMIjhp83Egvia',
   },
+
+  // passwords are: abc123
+
   {
     username: 'Franzi',
     email: 'notreal2@email.at',
-    password_hash: 'dsh78932z4iutzrtzrtzhfghft',
+    password_hash:
+      '$2b$12$7uko00ffLocRlRNImwl.zu4oP3ctHK9NgZ5ustrhaMIjhp83Egvia',
   },
 ];
 

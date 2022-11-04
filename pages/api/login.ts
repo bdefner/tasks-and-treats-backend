@@ -4,7 +4,7 @@ import { getUserWithPasswordHashByUsername } from '../../database/users';
 
 type LoginResponseBody =
   | { errors: { message: string }[] }
-  | { user: { username: string } };
+  | { user: { username: string; userId: number; userEmail: string } };
 
 export default async function handler(
   request: NextApiRequest,
@@ -72,6 +72,12 @@ export default async function handler(
 
     // response of successful request
 
-    response.status(200).json({ user: { username: userByUsername.username } });
+    response.status(200).json({
+      user: {
+        username: userByUsername.username,
+        userId: userByUsername.userId,
+        userEmail: userByUsername.email,
+      },
+    });
   }
 }

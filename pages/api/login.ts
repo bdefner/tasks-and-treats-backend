@@ -70,7 +70,7 @@ export default async function handler(
 
     // Create session token
 
-    // response of successful request
+    // Response of successful request
 
     response.status(200).json({
       user: {

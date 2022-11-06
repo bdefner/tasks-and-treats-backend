@@ -64,3 +64,25 @@ export async function createUser(
   // return the user without the password_hash!
   return userWithoutPasswordHash;
 }
+
+export async function getUserBySessionToken(token: string) {
+  if (!token) return undefined;
+
+  const [user] = await sql<{ id: number; username: string }[]>`
+
+  SELECT
+    users.user_id,
+    users.username,
+    users.email
+  FROM
+    users,
+    sessions
+  WHERE
+    sessions.token = ${token} AND
+    sessions.user_id = users.user_id;
+    -- AND
+    -- sessions.expiry_timestamp > now();
+  `;
+
+  return user;
+}

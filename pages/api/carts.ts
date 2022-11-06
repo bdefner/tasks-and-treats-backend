@@ -1,3 +1,5 @@
+// This endpoint receives a userId and a session token. It checks if the Token matches the one stored for the userId in the database as well for the expiration date. If ok, it returns the users carts
+
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getAllCartsByUserId } from '../../database/carts';
 

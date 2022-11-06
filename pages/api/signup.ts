@@ -7,7 +7,7 @@ import { createCsrfSecret } from '../../utils/csrf';
 
 type SignupResponseBody =
   | { errors: { message: string }[] }
-  | { user: { username: string } };
+  | { user: { username: string; sessionToken: string } };
 
 export default async function handler(
   request: NextApiRequest,
@@ -99,11 +99,15 @@ export default async function handler(
         secret,
       );
 
-      // Save the session token
+      // Note: sessionToken is saved in the frontent. See: ../store/auth-context.js
 
-      response
-        .status(200)
-        .json({ user: { username: userWithoutPasswordHash.username } });
+      response.status(200).json({
+        user: {
+          userId: userWithoutPasswordHash.userId,
+          username: userWithoutPasswordHash.username,
+          sessionToken: session.token,
+        },
+      });
     }
   }
 }

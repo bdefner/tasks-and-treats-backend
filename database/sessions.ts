@@ -7,6 +7,12 @@ type Session = {
   csrfSecret: string;
 };
 
+type SessionWithUserId = {
+  id: number;
+  token: string;
+  csrfSecret: string;
+  userId: number | null; // note: test tokens do not contain a userId - remove before beta release!
+};
 export async function createSession(
   userId: User['userId'],
   token: string,
@@ -31,11 +37,12 @@ export async function createSession(
 export async function getValidSessionByToken(token: Session['token']) {
   if (!token) return undefined;
 
-  const [session] = await sql<Session[]>`
+  const [session] = await sql<SessionWithUserId[]>`
   SELECT
     sessions.id,
     sessions.token,
-    sessions.csrf_secret
+    sessions.csrf_secret,
+    sessions.user_id
   FROM
     sessions
   WHERE

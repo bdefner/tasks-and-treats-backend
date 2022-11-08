@@ -1,10 +1,20 @@
+import crypto from 'node:crypto';
 import bcrypt from 'bcrypt';
 import { NextApiRequest, NextApiResponse } from 'next';
+import { createSession } from '../../database/sessions';
 import { getUserWithPasswordHashByUsername } from '../../database/users';
+import { createCsrfSecret } from '../../utils/csrf';
 
 type LoginResponseBody =
   | { errors: { message: string }[] }
-  | { user: { username: string; userId: number; userEmail: string } };
+  | {
+      user: {
+        username: string;
+        userId: number;
+        userEmail: string;
+        sessionToken: string;
+      };
+    };
 
 export default async function handler(
   request: NextApiRequest,
@@ -68,8 +78,16 @@ export default async function handler(
       return;
     }
 
-    // Create session token
+    // Create a csrf secret
 
+    const secret = await createCsrfSecret();
+
+    // Create session token
+    const session = await createSession(
+      userByUsername.userId,
+      crypto.randomBytes(80).toString('base64'),
+      secret,
+    );
     // Response of successful request
 
     response.status(200).json({
@@ -77,6 +95,7 @@ export default async function handler(
         username: userByUsername.username,
         userId: userByUsername.userId,
         userEmail: userByUsername.email,
+        sessionToken: session.token,
       },
     });
   }

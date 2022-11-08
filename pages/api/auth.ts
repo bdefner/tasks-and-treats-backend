@@ -15,6 +15,8 @@ export default async function handler(
     });
   }
 
+  // Check if the request body is parsed
+
   let parsedRequestBody = request.body;
 
   try {
@@ -22,11 +24,8 @@ export default async function handler(
   } catch (error) {
     console.log(error);
   }
-  console.log('request.body: ', request.body);
 
   // Check if the request contains a session token
-
-  console.log('request.body.sessionToken: ', parsedRequestBody.sessionToken);
 
   if (!parsedRequestBody.sessionToken) {
     response

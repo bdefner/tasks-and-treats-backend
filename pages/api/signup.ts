@@ -7,7 +7,7 @@ import { createCsrfSecret } from '../../utils/csrf';
 
 type SignupResponseBody =
   | { errors: { message: string }[] }
-  | { user: { username: string; sessionToken: string } };
+  | { user: { userId: number; username: string; sessionToken: string } };
 
 export default async function handler(
   request: NextApiRequest,

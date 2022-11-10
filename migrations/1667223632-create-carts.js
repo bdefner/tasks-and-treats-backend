@@ -15,19 +15,19 @@ exports.up = async (sql) => {
   await sql`INSERT INTO carts
   (user_id, time_of_creation, type_id, label, rating, status_id)
 VALUES
- (1, '2022-10-31', 1, 'This is the first personal Task of user with id 1', 8, 1),
- (1, '2022-10-31', 2, 'This is the first personal Treat of user with id 1', 3, 1),
- (2, '2022-10-31', 1, 'This is the first personal Task of user with id 2', 8, 1),
- (2, '2022-10-31', 2, 'This is the first personal Treat of user with id 2', 3, 1)
+ (1, '2022-10-31', 1, 'This is the first personal Task of user with id 1', 10, 1),
+ (1, '2022-10-31', 2, 'This is the first personal Treat of user with id 1', 10, 1),
+ (2, '2022-10-31', 1, 'This is the first personal Task of user with id 2', 10, 1),
+ (2, '2022-10-31', 2, 'This is the first personal Treat of user with id 2', 10, 1)
   `;
 
   await sql`INSERT INTO carts
   (user_id, time_of_creation, type_id, label, rating, status_id, group_id)
 VALUES
- (1, '2022-10-31', 1, 'This is the first shared Task of user with id 1', 5, 3, 1),
- (1, '2022-10-31', 2, 'This is the first shared Treat of user with id 1', 4, 3, 1),
- (2, '2022-10-31', 2, 'This is the first shared Treat of user with id 2', 4, 3, 1),
- (2, '2022-10-31', 2, 'This is the first shared Treat of user with id 2', 4, 3, 1)
+ (1, '2022-10-31', 1, 'This is the first shared Task of user with id 1', 10, 3, 1),
+ (1, '2022-10-31', 2, 'This is the first shared Treat of user with id 1', 10, 3, 1),
+ (2, '2022-10-31', 2, 'This is the first shared Treat of user with id 2', 10, 3, 1),
+ (2, '2022-10-31', 2, 'This is the first shared Treat of user with id 2', 10, 3, 1)
  `;
 };
 

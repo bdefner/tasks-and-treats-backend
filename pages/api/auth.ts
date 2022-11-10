@@ -35,7 +35,6 @@ export default async function handler(
   }
 
   const user = await getUserBySessionToken(parsedRequestBody.sessionToken);
-  console.log('user: ', user);
 
   if (!user) {
     response

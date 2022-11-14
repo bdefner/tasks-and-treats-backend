@@ -3,7 +3,14 @@ import { getUserBySessionToken } from '../../database/users';
 
 type AuthResponseBody =
   | { errors: { message: string }[] }
-  | { user: { username: string; userId: number; userEmail: string } };
+  | {
+      user: {
+        username: string;
+        userId: number;
+        userEmail: string;
+        budget: number;
+      };
+    };
 
 export default async function handler(
   request: NextApiRequest,
@@ -51,6 +58,7 @@ export default async function handler(
         username: user.username,
         userId: user.userId,
         userEmail: user.email,
+        budget: user.budget,
       },
     });
   }

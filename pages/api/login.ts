@@ -12,6 +12,7 @@ type LoginResponseBody =
         username: string;
         userId: number;
         userEmail: string;
+        budget: number;
         sessionToken: string;
       };
     };
@@ -95,6 +96,7 @@ export default async function handler(
         username: userByUsername.username,
         userId: userByUsername.userId,
         userEmail: userByUsername.email,
+        budget: userByUsername.budget,
         sessionToken: session.token,
       },
     });

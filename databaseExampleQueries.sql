@@ -7,7 +7,8 @@
 CREATE TABLE users(
   user_id integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
   username varchar(70) NOT NULL UNIQUE,
-  password_hash varchar (100) NOT NULL UNIQUE
+  password_hash varchar (100) NOT NULL UNIQUE,
+  budget int
 );
 
 INSERT INTO users

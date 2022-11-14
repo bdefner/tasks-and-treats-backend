@@ -4,6 +4,7 @@ const users = [
     email: 'notreal@email.at',
     password_hash:
       '$2b$12$7uko00ffLocRlRNImwl.zu4oP3ctHK9NgZ5ustrhaMIjhp83Egvia',
+    budget: 28,
   },
 
   // passwords are: abc123
@@ -13,12 +14,19 @@ const users = [
     email: 'notreal2@email.at',
     password_hash:
       '$2b$12$7uko00ffLocRlRNImwl.zu4oP3ctHK9NgZ5ustrhaMIjhp83Egvia',
+    budget: 12,
   },
 ];
 
 exports.up = async (sql) => {
   await sql`
-    INSERT INTO users ${sql(users, 'username', 'email', 'password_hash')}
+    INSERT INTO users ${sql(
+      users,
+      'username',
+      'email',
+      'password_hash',
+      'budget',
+    )}
   `;
 };
 

@@ -5,6 +5,7 @@ export type User = {
   username: string;
   email: string;
   passwordHash: string;
+  budget: number;
 };
 
 export type UserWithoutPasswordHash = {
@@ -58,7 +59,8 @@ export async function createUser(
   RETURNING
     user_id,
     username,
-    email
+    email,
+    budget
   `;
 
   // return the user without the password_hash!
@@ -73,7 +75,8 @@ export async function getUserBySessionToken(token: string) {
   SELECT
     users.user_id,
     users.username,
-    users.email
+    users.email,
+    users.budget
   FROM
     users,
     sessions
@@ -84,5 +87,41 @@ export async function getUserBySessionToken(token: string) {
     -- sessions.expiry_timestamp > now();
   `;
 
+  return user;
+}
+
+export async function updateUserBudgetById(userId: number, budget: number) {
+  const [user] = await sql<User[]>`
+  UPDATE
+    users
+  SET
+    budget=${budget}
+  WHERE
+    user_id = ${userId}
+    RETURNING
+    user_id
+  `;
+  return user;
+}
+
+export async function updateUserById(
+  userId: number,
+  username: string,
+  userEmail: string,
+) {
+  const [user] = await sql<User[]>`
+  UPDATE
+  users
+SET
+  username= ${username},
+  email= ${userEmail}
+WHERE
+  user_id = ${userId}
+RETURNING
+  user_id,
+  username,
+  email
+`;
+  console.log('user in database:', user);
   return user;
 }

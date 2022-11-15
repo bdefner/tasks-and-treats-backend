@@ -19,11 +19,7 @@ export default async function getAllCarts(
     console.log(error);
   }
 
-  console.log('parsedRequestBody.userId: ', parsedRequestBody.userId);
-
   // Check if userId and sessionToken is provided
-
-  console.log('!parsedRequestBody.userId: ', !parsedRequestBody.userId);
 
   if (!parsedRequestBody.userId) {
     response

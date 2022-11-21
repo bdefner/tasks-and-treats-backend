@@ -7,7 +7,12 @@ const challenges = [
   {
     label: '🧚 You deserve this',
     description: 'Redeem your first treat',
-    reward: 1,
+    reward: 5,
+  },
+  {
+    label: '👨‍🎓 Junior procrastinator',
+    description: 'Have 5 tasks undone for over one weeks',
+    reward: -3,
   },
   {
     label: '💎 Scrimper',

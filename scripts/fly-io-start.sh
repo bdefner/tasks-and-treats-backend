@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Exit if any command exits with a non-zero exit code
-set -e
+set -o errexit
 
 # Set volume path for use in PostgreSQL paths if volume directory exists
 [ -d "../postgres-volume" ] && VOLUME_PATH=/postgres-volume

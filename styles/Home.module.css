@@ -1,17 +1,131 @@
-.container {
-  padding: 0 2rem;
+/* :root {
+  --green_1: '#31D35F';
+  --green_2: '#64de87';
+  --green_3: '#97e9af';
+  --purple_1: '#8D40CA';
+  --purple_2: '#ba8bde';
+  --redAlert: '#ea3c59';
+  --greyBorder: '#e1e1e1';
+  --yellowStar: '#fdd800';
+} */
+
+.pageContainer {
+  padding: 50px;
+  height: 100vh;
+  overflow: hidden;
 }
 
 .main {
   min-height: 100vh;
-  padding: 4rem 0;
   flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
+  background: linear-gradient(
+    163deg,
+    rgba(49, 211, 95, 1) 0%,
+    rgba(219, 247, 227, 1) 14%,
+    rgba(255, 255, 255, 1) 25%,
+    rgba(255, 255, 255, 1) 66%,
+    rgba(225, 204, 241, 1) 88%,
+    rgba(141, 64, 202, 1) 100%
+  );
 }
 
+#navWrap {
+  margin-top: 80px;
+  overflow: hidden;
+  border-radius: 8px;
+  background-color: #ffffff;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  box-shadow: 10px 10px 24px -13px rgba(51, 51, 51, 0.7);
+  -webkit-box-shadow: 10px 10px 24px -13px rgba(121, 0, 95, 0.7);
+  -moz-box-shadow: 10px 10px 24px -13px rgba(51, 51, 51, 0.7);
+}
+
+.navLink {
+  padding: 8px 16px 8px 16px;
+  transition: 0.5s;
+}
+
+.navLink:hover {
+  background-color: #8d40ca;
+  color: white;
+}
+
+.navLink:active {
+  background-color: #31d35f;
+  color: white;
+}
+.greenText {
+  color: #31d35f;
+}
+
+.purpleText {
+  color: #8d40ca;
+}
+
+.columnWrap {
+  display: flex;
+  flex-direction: row;
+  padding: 25px;
+}
+
+.paragraphWrap {
+  padding: 16px;
+  margin-left: 50px;
+  width: 450px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.BlackButton {
+  margin: 16px 0 16px 0;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 8px 16px 8px 16px;
+  border-radius: 8px;
+  background-color: #24282e;
+  color: white;
+  width: auto;
+  transition: ease;
+}
+.BlackButton > p {
+  padding: 0;
+  margin: 0;
+}
+
+.icon {
+  height: 32px;
+  width: 32px;
+  margin: 0px 8px 0px 8px;
+}
+#phone {
+  height: 380px;
+  width: 200px;
+}
+
+.listWrap {
+  height: 500px;
+  overflow: scroll;
+}
+.imgParagraph {
+  display: flex;
+}
+.imgParagraph > img {
+  margin-right: 16px;
+}
+
+#profileImg {
+  border-radius: 50%;
+  width: 200px;
+  height: 200px;
+  margin-right: 25px;
+}
 .footer {
   display: flex;
   flex: 1;
@@ -28,34 +142,29 @@
   flex-grow: 1;
 }
 
-.title a {
-  color: #0070f3;
-  text-decoration: none;
-}
-
-.title a:hover,
-.title a:focus,
-.title a:active {
-  text-decoration: underline;
-}
-
-.title {
-  margin: 0;
-  line-height: 1.15;
-  font-size: 4rem;
-}
-
-.title,
 .description {
+  max-width: 900px;
+  padding: 25px;
   text-align: center;
 }
 
-.description {
-  margin: 4rem 0;
-  line-height: 1.5;
-  font-size: 1.5rem;
+.box {
+  margin: 50px;
+  padding: 50px;
+  border: 1px solid #eaeaea;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 10px 10px 24px -13px rgba(51, 51, 51, 0.7);
+  -webkit-box-shadow: 10px 10px 24px -13px rgba(121, 0, 95, 0.7);
+  -moz-box-shadow: 10px 10px 24px -13px rgba(51, 51, 51, 0.7);
 }
 
+.flexColumn {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
 .code {
   background: #fafafa;
   border-radius: 5px;

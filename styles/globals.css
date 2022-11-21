@@ -15,12 +15,21 @@ a {
   box-sizing: border-box;
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
-  body {
-    color: white;
-    background: black;
-  }
+h1 {
+  text-align: center;
+  font-weight: 300;
+  font-size: 2.5rem;
+}
+
+h2 {
+  margin-top: 42px;
+}
+
+h3 {
+  margin-top: 32px;
+}
+
+span {
+  font-weight: 700;
+  margin-top: 16px;
 }

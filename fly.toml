@@ -1,4 +1,4 @@
-app = "next-js-example-fall-2022"
+app = "tasks-and-treats-backend"
 kill_signal = "SIGINT"
 kill_timeout = 5
 processes = []

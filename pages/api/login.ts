@@ -37,15 +37,8 @@ export default async function handler(
       console.log(error);
     }
 
-    console.log('parsedRequestBody: ', parsedRequestBody);
-
     // Check if the input is correct
-    if (
-      // typeof request.body.username !== 'string' ||
-      // typeof request.body.password !== 'string' ||
-      !parsedRequestBody.username ||
-      !parsedRequestBody.password
-    ) {
+    if (!parsedRequestBody.username || !parsedRequestBody.password) {
       response.status(400).json({
         errors: [
           {

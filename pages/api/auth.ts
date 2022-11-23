@@ -14,7 +14,7 @@ type AuthResponseBody =
 
 export default async function handler(
   request: NextApiRequest,
-  response: NextApiResponse,
+  response: NextApiResponse<AuthResponseBody>,
 ) {
   if (request.method !== 'POST') {
     response.status(401).json({

@@ -1,34 +1,84 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Tasks and Treats backend
 
-## Getting Started
+This Next.js project serves as a backend and landingpage for the [Tasks and Treats react native expo app.](https://github.com/bdefner/tasks-and-treats-react-native-project)
+However, feel free to use the api for your own projects if you wish to do so! The api allows user registration, login and authentication, as well as creating "carts" for users, containing a string, timestamp, due-date and additional columns as explained below. Carts can be connceted in ajoin table, so there's everything there for a chat or messanging app, for example.
+Please make sure to use correct objects and types in your requests as listed below, since requests that do not meet these ctriteria will be rejected.
 
-First, run the development server:
+This project is deployed with fly.io on an alpine:18 machine:
+https://tasks-and-treats-backend.fly.dev
 
-```bash
-npm run dev
-# or
-yarn dev
-```
+## Technologies
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Next.js, PostgreSQL, bcrypt, csrf, ley (for migrations), playwright (for testing)
 
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
+## Request and respones Types
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.js`.
+The following objects and types are used by the api.
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+`user: { userId: number; username: string; userEmail: string; sessionToken: string }`
 
-## Learn More
+`cart: { userId: number, timeOfCreation: Date, typeId: number, label: string, rating: number, dueDate: Date | null, statusId: number, assignedToUserId: number | null, receivedFromUserId: number | null, groupId: number | null }`
 
-To learn more about Next.js, take a look at the following resources:
+`challenges: { challengeId: number; label: string; description: string; reward: number; }`
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## API Endpoints
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+All Endpoints only ecept request with method: POST.
 
-## Deploy on Vercel
+### /api/signup
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Request body: 'username', 'email' and 'password'
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+- Response: 'userId', 'sessionToken'
+
+### /api/login
+
+- Request body: 'username', 'password'
+
+- Response: 'userId', 'userEmail', budget, sessionToken
+
+### /api/auth
+
+- Request body: 'userId', 'sessionToken'
+
+- Response: 'username, userId', 'userEmail', budget
+
+### /api/logout
+
+- Request body: 'userId', 'sessionToken'
+
+- Response: 'success: "Session token deleted"
+
+### /api/getcarts
+
+fetches all carts associated with the userId
+
+- Request body: 'userId', 'sessionToken'
+
+- Response: 'carts'
+
+### /api/getchallenges
+
+The tasks and treats app has some challenges for the users. If the users acchieve those is checked in the backend.
+
+- Request body: 'userId', 'sessionToken'
+
+- Response: 'challenges'
+
+### /api/createcart
+
+- Request body: 'userId', 'sessionToken', 'timeOfCreation', 'typeId', 'label', 'rating', 'statusId'
+
+- Response: 'cartId'
+
+### /api/updatecart
+
+- Request body: 'userId', 'sessionToken', 'timeOfCreation', 'typeId', 'label', 'rating', 'statusId'
+
+- Response: 'cartId'
+
+### /api/deletecart
+
+- Request body: 'userId', 'sessionToken', 'cartId'
+
+- Response: 'cartId'

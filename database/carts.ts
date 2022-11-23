@@ -3,11 +3,11 @@ import { sql } from './connect';
 export type Carts = {
   cartId: number;
   userId: number;
-  timeOfCreation: string;
+  timeOfCreation: Date;
   typeId: number;
   label: string;
   rating: number;
-  dueDate: string | null;
+  dueDate: Date | null;
   statusId: number;
   assignedToUserId: number | null;
   receivedFromUserId: number | null;

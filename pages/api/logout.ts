@@ -55,10 +55,6 @@ export default async function handler(
     return;
   }
 
-  console.log('confirmedToken.userId: ', confirmedToken.userId);
-  console.log('parsedRequestBody.userId: ', parsedRequestBody.userId);
-  // Security check: The parsedRequestBody.UserId = userId associated with the Token
-
   if (confirmedToken.userId !== parseInt(parsedRequestBody.userId)) {
     response
       .status(400)

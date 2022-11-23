@@ -31,8 +31,6 @@ export default async function handler(
     // Check if the input is correct
 
     if (
-      // typeof request.body.username !== 'string' ||
-      // typeof request.body.password !== 'string' ||
       !parsedRequestBody.username ||
       !parsedRequestBody.email ||
       !parsedRequestBody.password
@@ -54,16 +52,6 @@ export default async function handler(
         .status(401)
         .json({ errors: [{ message: `Username is already taken!` }] });
     }
-
-    // ToDo Check if the email address  is already taken
-
-    // const userByEmail = await getUserByEmail(request.body.email);
-
-    // // if (userByEmail) {
-    // //   response
-    // //     .status(401)
-    // //     .json({ message: 'Email address is already in use!' });
-    // // }
 
     // Hash the password
 
@@ -98,8 +86,6 @@ export default async function handler(
         crypto.randomBytes(80).toString('base64'),
         secret,
       );
-
-      // Note: sessionToken is saved in the frontent. See: ../store/auth-context.js
 
       response.status(200).json({
         user: {

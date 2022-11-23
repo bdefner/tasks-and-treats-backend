@@ -1,9 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import {
-  CreateCart,
-  getCartByCartId,
-  UpdateCartByCartId,
-} from '../../database/carts';
+import { getCartByCartId, UpdateCartByCartId } from '../../database/carts';
 import { getUserBySessionToken } from '../../database/users';
 
 type SignupResponseBody =
@@ -49,8 +45,6 @@ export default async function handler(
     }
 
     // Check if the sessionToken is valid
-
-    console.log('parsedRequestBody. ', parsedRequestBody);
 
     const user = await getUserBySessionToken(parsedRequestBody.sessionToken);
 

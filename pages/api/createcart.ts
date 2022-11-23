@@ -2,13 +2,13 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { CreateCart } from '../../database/carts';
 import { getUserBySessionToken } from '../../database/users';
 
-type SignupResponseBody =
+type CreateCartsResponseBody =
   | { errors: { message: string }[] }
   | { cart: { cartId: number } };
 
 export default async function handler(
   request: NextApiRequest,
-  response: NextApiResponse<SignupResponseBody>,
+  response: NextApiResponse<CreateCartsResponseBody>,
 ) {
   // Check for method
 
@@ -48,8 +48,6 @@ export default async function handler(
 
     // Check if the sessionToken is valid
 
-    console.log('parsedRequestBody. ', parsedRequestBody);
-
     const user = await getUserBySessionToken(parsedRequestBody.sessionToken);
 
     console.log('user: ', user);
@@ -61,12 +59,6 @@ export default async function handler(
     }
 
     // Check if userId is associated with the sessionToken
-
-    console.log('user.userId ', user.userId);
-    console.log(
-      'parseInt(parsedRequestBody.userId: ',
-      parseInt(parsedRequestBody.userId),
-    );
 
     if (user.userId !== parseInt(parsedRequestBody.userId)) {
       response.status(401).json({
@@ -92,7 +84,6 @@ export default async function handler(
       parsedRequestBody.groupId,
     );
 
-    console.log('newCart: ', newCart);
     const cart = { cartId: newCart.cartId };
 
     // Response of successful request

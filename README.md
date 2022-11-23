@@ -9,7 +9,7 @@ https://tasks-and-treats-backend.fly.dev
 
 ## Technologies
 
-Next.js, PostgreSQL, bcrypt, csrf, ley (for migrations), playwright (for testing)
+Next.js, PostgreSQL, TypeScript, bcrypt, csrf, ley (for migrations), playwright (for testing)
 
 ## Request and respones Types
 
@@ -82,3 +82,9 @@ The tasks and treats app has some challenges for the users. If the users acchiev
 - Request body: 'userId', 'sessionToken', 'cartId'
 
 - Response: 'cartId'
+
+## The database
+
+The database runs with postgreSQL. [Here is the scheme as sketched in drawSQL](https://drawsql.app/teams/beppinos-team/diagrams/tasks-and-treats):
+
+![Database scheme](/public/Tasks-and-treats-database.png)

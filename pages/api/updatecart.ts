@@ -21,11 +21,11 @@ export default async function handler(
 
     let parsedRequestBody = request.body;
 
-    try {
-      parsedRequestBody = JSON.parse(request.body);
-    } catch (error) {
-      console.log(error);
-    }
+    // try {
+    //   parsedRequestBody = JSON.parse(request.body);
+    // } catch (error) {
+    //   console.log(error);
+    // }
 
     if (
       !parsedRequestBody.userId ||

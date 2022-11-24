@@ -21,6 +21,7 @@ export default async function handler(
   request: NextApiRequest,
   response: NextApiResponse<LoginResponseBody>,
 ) {
+  console.log('request: ', request);
   // Check for request method
   if (request.method !== 'POST') {
     response.status(401).json({

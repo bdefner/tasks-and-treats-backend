@@ -99,7 +99,8 @@ export async function updateUserBudgetById(userId: number, budget: number) {
   WHERE
     user_id = ${userId}
     RETURNING
-    user_id
+    user_id,
+    budget
   `;
   return user;
 }
@@ -122,6 +123,5 @@ RETURNING
   username,
   email
 `;
-  console.log('user in database:', user);
   return user;
 }

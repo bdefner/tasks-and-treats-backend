@@ -52,9 +52,9 @@ export async function CreateCart(
   rating: number,
   dueDate: Date | null,
   statusId: number,
-  assignedToUserId: number | any,
-  receivedFromUserId: number | any,
-  groupId: number | any,
+  assignedToUserId: number | null,
+  receivedFromUserId: number | null,
+  groupId: number | null,
 ) {
   // values that are potentially not provided need to be null
   const saveDueDate = dueDate ? dueDate : null;
@@ -105,6 +105,5 @@ export async function UpdateCartByCartId(
       cart_id = ${cartId}
     RETURNING *
   `;
-  console.log('cart', cart);
   return cart;
 }

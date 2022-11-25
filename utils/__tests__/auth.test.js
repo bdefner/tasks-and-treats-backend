@@ -4,6 +4,7 @@
 
 import {
   createUser,
+  deleteUser,
   getUserBySessionToken,
   getUserByUsername,
   updateUserBudgetById,
@@ -28,6 +29,7 @@ test('Login with correct and incorrect arguments', async () => {
 test('Create a user, update and delete', async () => {
   const randomUsername = JSON.stringify(Math.floor(Math.random() * 10000));
 
+  // Create a user
   const newUser = await createUser(
     randomUsername,
     'noEmail@geemail.to',
@@ -36,15 +38,29 @@ test('Create a user, update and delete', async () => {
 
   expect(newUser.username).toBe(randomUsername);
 
-  let UpdatedUser = await updateUserById(
+  // Update the user
+  let response = await updateUserById(
     newUser.userId,
     'John Dow',
     newUser.email,
   );
 
-  expect(UpdatedUser).toBe(UpdatedUser);
+  expect(response).toBe(response);
 
-  UpdatedUser = await updateUserBudgetById(newUser.userId, 100);
+  // Update the user's budget
 
-  expect(UpdatedUser.budget).toBe(100);
+  response = await updateUserBudgetById(newUser.userId, 100);
+
+  expect(response.budget).toBe(100);
+
+  // Delete the user
+
+  response = await deleteUser(newUser.userId);
+
+  expect(response.userId).toBe(newUser.userId);
+
+  // Check if the user does not exists anymore
+
+  response = await getUserByUsername(newUser.username);
+  expect(response).toBe(undefined);
 });

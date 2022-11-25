@@ -125,3 +125,14 @@ RETURNING
 `;
   return user;
 }
+
+export async function deleteUser(userId: number) {
+  const [user] = await sql<User[]>`
+  DELETE FROM
+    users
+  WHERE
+    user_id = ${userId}
+  RETURNING
+    user_id`;
+  return user;
+}

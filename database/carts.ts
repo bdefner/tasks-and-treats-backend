@@ -74,9 +74,9 @@ export async function CreateCart(
 }
 
 export async function DeleteCartByCartId(cartId: number) {
-  // if (!cartId || typeof cartId !== 'number') {
-  //   return undefined;
-  // }
+  if (!cartId || typeof cartId !== 'number') {
+    return undefined;
+  }
 
   const [cart] = await sql<Carts[]>`
     DELETE FROM

@@ -4,6 +4,7 @@
 
 import {
   CreateCart,
+  DeleteCartByCartId,
   getCartByCartId,
   UpdateCartByCartId,
 } from '../../database/carts';
@@ -77,4 +78,14 @@ test('Create a cart, update and delete it', async () => {
     newCart.statusId,
   );
   expect(response).not.toStrictEqual(newCart);
+
+  // Delete cart
+  response = await DeleteCartByCartId(cartId);
+  expect(response).not.toBe(undefined);
+
+  // Check if cart does not exist anymore
+
+  response = await getCartByCartId(cartId);
+
+  expect(response).toBe(undefined);
 });

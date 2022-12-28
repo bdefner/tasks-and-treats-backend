@@ -14,6 +14,7 @@ type LoginResponseBody =
         userEmail: string;
         budget: number;
         sessionToken: string;
+        inviteToken: string;
       };
     };
 
@@ -21,7 +22,6 @@ export default async function handler(
   request: NextApiRequest,
   response: NextApiResponse<LoginResponseBody>,
 ) {
-  console.log('request: ', request);
   // Check for request method
   if (request.method !== 'POST') {
     response.status(401).json({
@@ -92,6 +92,7 @@ export default async function handler(
         userEmail: userByUsername.email,
         budget: userByUsername.budget,
         sessionToken: session.token,
+        inviteToken: userByUsername.inviteToken,
       },
     });
   }

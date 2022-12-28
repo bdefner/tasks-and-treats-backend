@@ -1,5 +1,11 @@
 const challenges = [
   {
+    label: '🤙 Spread the news',
+    description:
+      'Invite a friend to use this app and receive your rewards, when this code is used on registration:',
+    reward: 10,
+  },
+  {
     label: '👼 Noob!',
     description: 'Add your first task',
     reward: 1,

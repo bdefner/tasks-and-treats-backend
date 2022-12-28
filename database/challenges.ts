@@ -1,3 +1,4 @@
+import crypto from 'node:crypto';
 import { sql } from './connect';
 
 export type Challenges = {
@@ -14,6 +15,8 @@ export async function GetAllChallenges() {
   FROM
     challenges
   `;
+
+  console.log('challenges: ', challenges);
 
   return challenges;
 }

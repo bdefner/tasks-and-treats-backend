@@ -1,5 +1,6 @@
 import crypto from 'node:crypto';
 import bcrypt from 'bcrypt';
+import cryptoRandomString from 'crypto-random-string';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { createSession } from '../../database/sessions';
 import { createUser, getUserByUsername } from '../../database/users';
@@ -7,7 +8,14 @@ import { createCsrfSecret } from '../../utils/csrf';
 
 type SignupResponseBody =
   | { errors: { message: string }[] }
-  | { user: { userId: number; username: string; sessionToken: string } };
+  | {
+      user: {
+        userId: number;
+        username: string;
+        sessionToken: string;
+        inviteToken: string;
+      };
+    };
 
 export default async function handler(
   request: NextApiRequest,
@@ -59,10 +67,14 @@ export default async function handler(
 
     // Create the user
 
+    const inviteToken = cryptoRandomString({ length: 10, type: 'base64' });
+
     const userWithoutPasswordHash = await createUser(
       parsedRequestBody.username,
       parsedRequestBody.email,
       passwordHash,
+      0,
+      inviteToken,
     );
 
     if (!userWithoutPasswordHash) {
@@ -92,6 +104,7 @@ export default async function handler(
           userId: userWithoutPasswordHash.userId,
           username: userWithoutPasswordHash.username,
           sessionToken: session.token,
+          inviteToken: inviteToken,
         },
       });
     }

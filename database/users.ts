@@ -21,7 +21,8 @@ export async function getUserByUsername(username: string) {
   SELECT
     user_id,
     username,
-    email
+    email,
+    invite_token
   FROM
     users
   WHERE
@@ -50,17 +51,20 @@ export async function createUser(
   username: string,
   email: string,
   passwordHash: string,
+  budget: number,
+  inviteToken: string,
 ) {
   const [userWithoutPasswordHash] = await sql<UserWithoutPasswordHash[]>`
   INSERT INTO users
-    (username, email, password_hash)
+    (username, email, password_hash, budget, invite_token)
   VALUES
-  (${username}, ${email}, ${passwordHash} )
+  (${username}, ${email}, ${passwordHash}, 0, ${inviteToken})
   RETURNING
     user_id,
     username,
     email,
-    budget
+    budget,
+    invite_token
   `;
 
   // return the user without the password_hash!
@@ -76,7 +80,8 @@ export async function getUserBySessionToken(token: string) {
     users.user_id,
     users.username,
     users.email,
-    users.budget
+    users.budget,
+    users.invite_token
   FROM
     users,
     sessions
@@ -90,6 +95,20 @@ export async function getUserBySessionToken(token: string) {
   return user;
 }
 
+export async function updateUserByInviteToken(InviteToken: string) {
+  const [user] = await sql<User[]>`
+  UPDATE
+    users
+  SET
+    budget= budget +10
+  WHERE
+    invite_token = ${InviteToken}
+  RETURNING
+    username
+  `;
+  return user;
+}
+
 export async function updateUserBudgetById(userId: number, budget: number) {
   const [user] = await sql<User[]>`
   UPDATE
@@ -98,7 +117,7 @@ export async function updateUserBudgetById(userId: number, budget: number) {
     budget=${budget}
   WHERE
     user_id = ${userId}
-    RETURNING
+  RETURNING
     user_id,
     budget
   `;

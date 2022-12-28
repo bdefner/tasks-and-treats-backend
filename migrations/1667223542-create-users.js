@@ -5,6 +5,7 @@ const users = [
     password_hash:
       '$2b$12$7uko00ffLocRlRNImwl.zu4oP3ctHK9NgZ5ustrhaMIjhp83Egvia',
     budget: 28,
+    invite_token: '$2b$12$7uk',
   },
 
   // passwords are: abc123
@@ -15,6 +16,7 @@ const users = [
     password_hash:
       '$2b$12$7uko00ffLocRlRNImwl.zu4oP3ctHK9NgZ5ustrhaMIjhp83Egvia',
     budget: 12,
+    invite_token: 'zu4oP3ctHK',
   },
 ];
 
@@ -26,6 +28,7 @@ exports.up = async (sql) => {
       'email',
       'password_hash',
       'budget',
+      'invite_token',
     )}
   `;
 };

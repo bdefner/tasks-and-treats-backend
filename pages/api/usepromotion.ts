@@ -1,15 +1,15 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { getUserBySessionToken } from '../../database/users';
+import {
+  getUserBySessionToken,
+  updateUserByInviteToken,
+  User,
+} from '../../database/users';
 
 type AuthResponseBody =
   | { errors: { message: string }[] }
   | {
       user: {
         username: string;
-        userId: number;
-        userEmail: string;
-        budget: number;
-        shareAppCode: string;
       };
     };
 
@@ -51,17 +51,25 @@ export default async function handler(
     return;
   }
 
+  // Check if the request body contains an inviteToken
+
+  if (!parsedRequestBody.inviteToken) {
+    response
+      .status(400)
+      .json({ errors: [{ message: 'inviteToken is missing' }] });
+  }
+
+  // Try to update budget on user of inviteToken
+
+  const userOfInviteToken = await updateUserByInviteToken(
+    parsedRequestBody.inviteToken,
+  );
+
+  // if (!userOfInviteToken.user) {
+  //   response.status(400).json({ errors: [{ message: 'invalid inviteToken' }] });
+  // }
+
   // Response of successful request
 
-  if (user) {
-    response.status(200).json({
-      user: {
-        username: user.username,
-        userId: user.userId,
-        userEmail: user.email,
-        budget: user.budget,
-        inviteToken: user.inviteToken,
-      },
-    });
-  }
+  response.status(200).json({ user: { username: userOfInviteToken.username } });
 }

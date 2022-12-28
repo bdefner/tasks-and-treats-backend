@@ -121,20 +121,46 @@ export default function ApiPage() {
             </div>
           </div>
           <div className={styles.box}>
-            <h2>Legend</h2>
-            <span>cart</span>
-            <p>
-              Conatains: 'label', 'timeOfCreation', 'rating', 'typeId',
-              'statusId'
-            </p>
-            <span>typeId</span>
-            <p>1: a task</p>
-            <p>2: a treat</p>
-            <span>statusId</span>
-            <p>1: in process </p>
-            <p>2: done </p>
-            <p>3: pending </p>
-            <p>4: accepted </p>
+            <div className={styles.limitWidth}>
+              <h2>Legend</h2>
+
+              <p>The following objects and types are used by the api.</p>
+              <div className={styles.codeWrap}>
+                {' '}
+                {'user: {'}
+                <br />
+                userId: number;
+                <br /> username: string;
+                <br /> userEmail: string;
+                <br /> sessionToken: string
+              </div>
+              <br />
+              <div className={styles.codeWrap}>
+                <p>
+                  {
+                    'cart: { userId: number, timeOfCreation: Date, typeId: number, label: string, rating: number, dueDate: Date | null, statusId: number, assignedToUserId: number | null, receivedFromUserId: number | null, groupId: number | null }'
+                  }
+                </p>
+              </div>
+              <br />
+              <div className={styles.codeWrap}>
+                <p>
+                  {
+                    'challenges: { challengeId: number; label: string; description: string; reward: number; }'
+                  }
+                </p>
+              </div>
+              <br />
+
+              <span>typeId</span>
+              <p>1: a task</p>
+              <p>2: a treat</p>
+              <span>statusId</span>
+              <p>1: in process </p>
+              <p>2: done </p>
+              <p>3: pending </p>
+              <p>4: accepted </p>
+            </div>
           </div>
         </div>
       </main>

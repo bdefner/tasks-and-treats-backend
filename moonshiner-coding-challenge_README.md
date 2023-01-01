@@ -5,7 +5,7 @@
 
 ## Task #1 - Gain 10 stars for inviting friends to the app
 
-### Pseudo code
+### Description
 
 1. - **In the backend**, I created an additional column "invite_token" in the user table of the database, which has to be unique to every user. On signup, the token is created using crypto and consits of a string of 10 characters (base64).
      I hab to update the api endpoints /signup, /login and /auth as well as the functions getUserByUsername(), createUser() and getUserBySessionToken() to create the token on signup and send the token to the frontend, when needed.
@@ -14,7 +14,7 @@
 1. - **In the frontend**, I added some elements and styles to the component ChallengeItem.js: A field to display the inviteToken and a Button to trigger sharing. When pressed, a link to the app (on expo) and a text containing the inviteToken is passed.
 1. - On signup, I created a new screen which appears after creating the user account. There the new user get's asked "How did you hear about this app" and get's to choose "Invited by a friend". If that option gets chosen, the user get's asked for the "invitation code" (= inviteToken), which she/he can paste inside. Then, the token gets fetched to the api endpoint /usepromotion as described above. If valid, the new user sees a message "<username of userB> received 10 stars!" while a Lottie animation is played and the current available challenges gets fetched from the backend.
 
-### Code snips corresponding to the pseudo code above
+### Code snips corresponding to the description above
 
 1 - In postgreSQL: create table user with invite_token
 
@@ -348,3 +348,493 @@ export default function AfterRegistration({ route }) {
 5 - AfterRegistrationScreen
 
 ![](/public/moonshiner-signup.png)
+
+## Task 2 - Dashboard and Leaderboard
+
+### Description
+
+1. - **In the backend**, there is a new table "connections", containing an id, "user_requested_id" for the user who requested the connection, "user_received_id" for the user who received the invitation to connect, as well as a connection_token, which is used to confirm a connection.
+2. - There is a new api endpoint /api/handleconnections. After checking for the correct method, for a valid sessionToken, checking and if the sessionToken is associated with the userId of the user sending the request, the request.Body is checked for "requestType". This has to either be "createConnection", "acceptConnection" or "getConnectionData".
+3. - "createConnection" returns a connectionToken, which
+4. - can be used in "acceptConnection" by a different user.
+5. - "getConnectionData" is used to respond an array, consisting of the usernames and the budget of stars of the connected user, which is then used in the frontend.
+6. - **In the frontend**, in the dashboard a new connection can be requested on the Dashboard screen, by clicking on [+Add]. This triggers a share function with a connection token in the content.
+7. - Another user can accept this request, by pasting the token into the Inputfield with the placeholder "invitation code" on the dashboard screen and clicking on [Confirm].
+8. - Once connections are set, the Data is fetched on login and the ranking is displayed on the dashboard -> leaderboard.
+
+### Code snips corresponding to the description above
+
+1. -
+
+new table:
+
+```
+CREATE TABLE connections(
+    connection_id integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    user_requested_id integer REFERENCES users (user_id) ON DELETE CASCADE,
+    user_received_id integer REFERENCES users (user_id) ON DELETE CASCADE,
+    connection_token varchar(10) UNIQUE NOT NULL
+
+```
+
+new api endpoint api/handleconnections:
+
+```
+import cryptoRandomString from 'crypto-random-string';
+import { NextApiRequest, NextApiResponse } from 'next';
+import {
+  acceptConnectionRequest,
+  createConnectionRequest,
+  getConnectionsByConnectionToken,
+  getConnectionsByUserId,
+} from '../../database/connections';
+import {
+  getUserBudgetByUserId,
+  getUserBySessionToken,
+} from '../../database/users';
+
+type SignupResponseBody =
+  | { errors: { message: string }[] }
+  | { user: { userId: number } };
+
+export default async function handler(
+  request: NextApiRequest,
+  response: NextApiResponse<SignupResponseBody>,
+) {
+  // Check for method
+
+  if (request.method !== 'POST') {
+    response.status(401).json({
+      errors: [{ message: 'This api endpoint only allows the method POST' }],
+    });
+  } else {
+    // Check if the body is parsed
+
+    let parsedRequestBody = request.body;
+
+    try {
+      parsedRequestBody = JSON.parse(request.body);
+    } catch (error) {
+      console.log(error);
+    }
+
+    if (!parsedRequestBody.userId || !parsedRequestBody.sessionToken) {
+      response.status(400).json({
+        errors: [
+          {
+            message: 'Bad request: userId or sessionToken not provided!',
+          },
+        ],
+      });
+    }
+
+    // Check if the sessionToken is valid
+
+    const user = await getUserBySessionToken(parsedRequestBody.sessionToken);
+
+    console.log('user:', user);
+    if (!user) {
+      response
+        .status(401)
+        .json({ errors: [{ message: 'Session token not valid' }] });
+      return;
+    }
+
+    // // Check if userId is associated with the sessionToken
+
+    if (user.userId !== parseInt(parsedRequestBody.userId)) {
+      response.status(401).json({
+        errors: [
+          { message: 'Could not verify the user. Better luck next time!' },
+        ],
+      });
+      return;
+    }
+
+    // Check for valid request type
+
+    if (!parsedRequestBody.requestType) {
+      response
+        .status(401)
+        .json({ errors: [{ message: 'requestType not provided' }] });
+      return;
+    }
+
+    // Successful request: Check for type request
+
+    if (parsedRequestBody.requestType === 'createConnection') {
+      const connectionToken = cryptoRandomString({
+        length: 10,
+        type: 'base64',
+      });
+
+      const connection = await createConnectionRequest(
+        user.userId,
+        connectionToken,
+      );
+
+      response.status(200).json(connectionToken);
+    }
+    if (parsedRequestBody.requestType === 'acceptConnection') {
+      if (!parsedRequestBody.connectionToken) {
+        response
+          .status(401)
+          .json({ errors: [{ message: 'connectionToken not provided' }] });
+        return;
+      }
+
+      // Check if connectionToken is valid
+
+      const testConnection = await getConnectionsByConnectionToken(
+        parsedRequestBody.connectionToken,
+      );
+
+      if (
+        !testConnection ||
+        testConnection.userReceivedId ||
+        testConnection.userRequestedId === parseInt(parsedRequestBody.userId)
+      ) {
+        response
+          .status(401)
+          .json({ errors: [{ message: 'connectionToken invalid' }] });
+        return;
+      } else {
+        const newConnection = await acceptConnectionRequest(
+          user.userId,
+          parsedRequestBody.connectionToken,
+        );
+        response.status(200).json(newConnection);
+        return;
+      }
+    }
+    if (parsedRequestBody.requestType === 'getConnections') {
+      const connections = await getConnectionsByUserId(
+        parsedRequestBody.userId,
+      );
+      console.log('connections in Backend', connections);
+      response.status(200).json(connections);
+      return;
+    }
+
+    if (parsedRequestBody.requestType === 'getConnectionsData') {
+      const ArrayOfConnectionUserIds = parsedRequestBody.connections.split(',');
+      if (!parsedRequestBody.connections || !parsedRequestBody.connections[0]) {
+        response
+          .status(401)
+          .json({ errors: [{ message: 'no connections sent' }] });
+        return;
+      }
+
+      // Get name and budget of connections
+
+      // Mapping doesn't work for any reason, so I used a for loop
+      // const connectionData = await ArrayOfConnectionUserIds.map(
+      //   async (item) => {
+      //     await getUserBudgetByUserId(item);
+      //   },
+      // );
+
+      const connectionData = [];
+
+      for (let i = 0; i < ArrayOfConnectionUserIds.length; i++) {
+        connectionData[i] = await getUserBudgetByUserId(
+          ArrayOfConnectionUserIds[i],
+        );
+      }
+
+      response.status(200).json(connectionData);
+    }
+
+    response.status(401).json({ errors: [{ message: 'invalid request' }] });
+    return;
+  }
+}
+
+```
+
+6. / 7. / 8.
+
+```
+import { useNavigation } from '@react-navigation/native';
+import * as SecureStore from 'expo-secure-store';
+import { useContext, useEffect, useState } from 'react';
+import {
+  Image,
+  Pressable,
+  ScrollView,
+  Share,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
+import CartsContext from '../utils/context/CartsContext';
+import globals, { userId } from '../utils/globals';
+import { colors, font, spacing } from '../utils/styleConstants';
+
+async function handleCreateNewConnectionRequest(userId) {
+  const sessionToken = await SecureStore.getItemAsync('sessionToken');
+  const apiUrl = `${globals.apiBaseUrl}/handleconnections`;
+
+  try {
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      header: {
+        Accept: 'application/json',
+        'content-type': 'application/json',
+        mode: 'no-cors',
+      },
+      body: JSON.stringify({
+        userId: userId,
+        sessionToken: sessionToken,
+        requestType: 'createConnection',
+      }),
+    });
+    const json = await response.json();
+
+    return json;
+  } catch (error) {
+    console.log(error);
+  }
+
+  return response;
+}
+async function handleConfirmConnection(userId, connectionToken) {
+  const sessionToken = await SecureStore.getItemAsync('sessionToken');
+  const apiUrl = `${globals.apiBaseUrl}/handleconnections`;
+
+  try {
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      header: {
+        Accept: 'application/json',
+        'content-type': 'application/json',
+        mode: 'no-cors',
+      },
+      body: JSON.stringify({
+        userId: userId,
+        sessionToken: sessionToken,
+        requestType: 'acceptConnection',
+        connectionToken: connectionToken,
+      }),
+    });
+    const json = await response.json();
+
+    return json;
+  } catch (error) {
+    console.log(error);
+  }
+
+  return response;
+}
+
+async function onShare(connectionToken) {
+  try {
+    const result = await Share.share({
+      message: `Let's challenge: ${connectionToken}`,
+    });
+    if (result.action === Share.sharedAction) {
+      if (result.activityType) {
+        // shared with activity type of result.activityType
+      } else {
+        // shared
+      }
+    } else if (result.action === Share.dismissedAction) {
+      // dismissed
+    }
+  } catch (error) {
+    alert(error.message);
+  }
+}
+
+export default function Dashboard({ route }) {
+  const user = route.params.user;
+  const [carts, setCarts] = useContext(CartsContext);
+  const navigation = useNavigation();
+  const [connectionToken, setConnectionToken] = useState('');
+  const [ranking, setRanking] = useState(() => {
+    console.log('globals.connections[0]: ', globals.connections[0]);
+    if (globals.connections[0]) {
+      const rankingData = globals.connections;
+      rankingData.push([{ budget: user.budget, username: user.username }]);
+
+      const sortedRankingData = []
+        .concat(rankingData)
+        .sort((a, b) => (a.budget > b.budget ? 1 : -1));
+      return sortedRankingData;
+    } else {
+      return [0];
+    }
+  });
+  const [displayConnections, setDisplayConnections] = useState(
+    ranking[0][0].budget === 0 ? false : true,
+  );
+
+  console.log('ranking: ', ranking);
+
+  const activeTasks = carts.filter((item) => {
+    return item.typeId === 1 && item.statusId === 1 && !item.groupId;
+  });
+
+  const activeTreats = carts.filter((item) => {
+    return item.typeId === 2 && item.statusId === 1 && !item.groupId;
+  });
+
+  return (
+    <ScrollView style={styles.screen}>
+      <View>
+        <View style={styles.chipWrap}>
+          <View
+            style={{
+              ...styles.chip,
+              backgroundColor: 'white',
+              flexDirection: 'row',
+            }}
+          >
+            <Text style={{ ...styles.chipCount, color: 'black' }}>
+              {user.budget}
+            </Text>
+            <Image
+              source={require('../assets/icons/star.png')}
+              style={{
+                width: spacing.medium_3,
+                height: spacing.medium_3,
+                marginLeft: spacing.small,
+              }}
+            />
+          </View>
+          <View style={{ ...styles.chip, flexDirection: 'row' }}>
+            <Image
+              source={require('../assets/icons/profile.png')}
+              style={{
+                width: spacing.medium_2,
+                height: spacing.medium_2,
+                marginRight: spacing.small,
+              }}
+            />
+            <Text style={styles.h1}>{user.username}</Text>
+          </View>
+        </View>
+      </View>
+      <View style={styles.chipWrap}>
+        <Pressable
+          onPress={() => {
+            navigation.navigate('Tasks');
+          }}
+          style={{ ...styles.chip, backgroundColor: colors.green_2 }}
+        >
+          <Text style={styles.chipHeading}>Tasks</Text>
+          <Text style={styles.chipCount}>{activeTasks.length}</Text>
+        </Pressable>
+        <Pressable
+          onPress={() => {
+            navigation.navigate('Treats');
+          }}
+          style={{ ...styles.chip, backgroundColor: colors.purple_2 }}
+        >
+          <Text style={styles.chipHeading}>Treats</Text>
+          <Text style={styles.chipCount}>{activeTreats.length}</Text>
+        </Pressable>
+        <Pressable
+          onPress={() => {
+            navigation.navigate('Challenges');
+          }}
+          style={{ ...styles.chip, backgroundColor: colors.black }}
+        >
+          <Text style={styles.chipHeading}>Challenges</Text>
+          <Text style={styles.chipCount}>2 / 12</Text>
+        </Pressable>
+      </View>
+      <Text style={{ ...styles.h2, marginTop: spacing.large_1 }}>
+        Leaderboard
+      </Text>
+      {displayConnections &&
+        ranking.map((element, index) => {
+          return (
+            <View key={index}>
+              <View
+                style={{
+                  ...styles.rankingListElementWrap,
+                  backgroundColor:
+                    index === 0 ? colors.green_1 : colors.green_3,
+                }}
+              >
+                <Text style={{ fontSize: font.size_3, color: 'white' }}>
+                  {index === 0 && '👑 '}
+                  {ranking[index][0].username}
+                </Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <Image
+                    source={require('../assets/icons/star.png')}
+                    style={{
+                      width: spacing.medium_1,
+                      height: spacing.medium_1,
+                      marginLeft: spacing.small,
+                    }}
+                  />
+                  <Text
+                    style={{
+                      marginLeft: spacing.small,
+                      color: 'white',
+                      fontSize: font.size_3,
+                    }}
+                  >
+                    {ranking[index][0].budget}
+                  </Text>
+                </View>
+              </View>
+            </View>
+          );
+        })}
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          marginTop: spacing.medium_2,
+        }}
+      >
+        <TextInput
+          style={{
+            ...styles.inputField,
+            color: colors.grey,
+            textAlign: 'center',
+          }}
+          placeholder="invitation code"
+          onChangeText={setConnectionToken}
+          autoCorrect={false}
+        />
+        <Pressable
+          onPress={async () =>
+            await handleConfirmConnection(user.userId, connectionToken)
+          }
+          style={{
+            ...styles.promoButton,
+            backgroundColor: colors.purple_1,
+            borderColor: colors.purple_1,
+          }}
+        >
+          <Text style={{ color: 'white' }}>Confirm</Text>
+        </Pressable>
+        <Pressable
+          onPress={async () => {
+            const connectionToken = await handleCreateNewConnectionRequest(
+              user.userId,
+            );
+
+            onShare(connectionToken);
+          }}
+          style={styles.promoButton}
+        >
+          <Text>+ Add</Text>
+        </Pressable>
+        <View></View>
+      </View>
+    </ScrollView>
+  );
+}
+
+```
+
+### Screenshots
+
+![](/public/moonshiner-dashboard.png)

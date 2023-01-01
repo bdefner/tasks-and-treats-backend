@@ -6,7 +6,10 @@ import {
   getConnectionsByConnectionToken,
   getConnectionsByUserId,
 } from '../../database/connections';
-import { getUserBySessionToken } from '../../database/users';
+import {
+  getUserBudgetByUserId,
+  getUserBySessionToken,
+} from '../../database/users';
 
 type SignupResponseBody =
   | { errors: { message: string }[] }
@@ -88,7 +91,7 @@ export default async function handler(
         connectionToken,
       );
 
-      response.status(200).json(connection);
+      response.status(200).json(connectionToken);
     }
     if (parsedRequestBody.requestType === 'acceptConnection') {
       if (!parsedRequestBody.connectionToken) {
@@ -126,11 +129,41 @@ export default async function handler(
       const connections = await getConnectionsByUserId(
         parsedRequestBody.userId,
       );
+      console.log('connections in Backend', connections);
       response.status(200).json(connections);
       return;
     }
 
-    response.status(401).json({ errors: [{ message: 'requestType invalid' }] });
+    if (parsedRequestBody.requestType === 'getConnectionsData') {
+      const ArrayOfConnectionUserIds = parsedRequestBody.connections.split(',');
+      if (!parsedRequestBody.connections || !parsedRequestBody.connections[0]) {
+        response
+          .status(401)
+          .json({ errors: [{ message: 'no connections sent' }] });
+        return;
+      }
+
+      // Get name and budget of connections
+
+      // Mapping doesn't work for any reason, so I used a for loop
+      // const connectionData = await ArrayOfConnectionUserIds.map(
+      //   async (item) => {
+      //     await getUserBudgetByUserId(item);
+      //   },
+      // );
+
+      const connectionData = [];
+
+      for (let i = 0; i < ArrayOfConnectionUserIds.length; i++) {
+        connectionData[i] = await getUserBudgetByUserId(
+          ArrayOfConnectionUserIds[i],
+        );
+      }
+
+      response.status(200).json(connectionData);
+    }
+
+    response.status(401).json({ errors: [{ message: 'invalid request' }] });
     return;
   }
 }

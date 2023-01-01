@@ -16,8 +16,6 @@ export async function GetAllChallenges() {
     challenges
   `;
 
-  console.log('challenges: ', challenges);
-
   return challenges;
 }
 

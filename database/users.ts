@@ -14,6 +14,23 @@ export type UserWithoutPasswordHash = {
   email: string;
 };
 
+export async function getUserBudgetByUserId(userId: string) {
+  if (!userId) return undefined;
+
+  const [user] = await sql<UserWithoutPasswordHash[]>`
+  SELECT
+    user_id,
+    username,
+    budget
+  FROM
+    users
+  WHERE
+    users.user_id = ${parseInt(userId)}
+  `;
+
+  return user;
+}
+
 export async function getUserByUsername(username: string) {
   if (!username) return undefined;
 

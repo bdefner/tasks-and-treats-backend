@@ -4,7 +4,7 @@ const users = [
     email: 'notreal@email.at',
     password_hash:
       '$2b$12$7uko00ffLocRlRNImwl.zu4oP3ctHK9NgZ5ustrhaMIjhp83Egvia',
-    budget: 28,
+    budget: 32,
     invite_token: '$2b$12$7uk',
   },
 
@@ -23,7 +23,7 @@ const users = [
     email: 'notreal3@email.at',
     password_hash:
       '$2b$12$7uko00ffLocRlRNImwl.zu4oP3ctHK9NgZ5ustrhaMIjhp83Egvia',
-    budget: 52,
+    budget: 23,
     invite_token: '7fxoP3ctHK',
   },
 ];

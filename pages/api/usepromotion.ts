@@ -65,9 +65,9 @@ export default async function handler(
     parsedRequestBody.inviteToken,
   );
 
-  // if (!userOfInviteToken.user) {
-  //   response.status(400).json({ errors: [{ message: 'invalid inviteToken' }] });
-  // }
+  if (!userOfInviteToken.user) {
+    response.status(400).json({ errors: [{ message: 'invalid inviteToken' }] });
+  }
 
   // Response of successful request
 

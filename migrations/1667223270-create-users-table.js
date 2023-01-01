@@ -6,7 +6,7 @@ exports.up = async (sql) => {
   email varchar(70) NOT NULL,
   password_hash varchar (100) NOT NULL,
   budget integer,
-  invite_token varchar(10)
+  invite_token varchar(10) NOT NULL UNIQUE
 )`;
 };
 
